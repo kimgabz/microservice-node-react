@@ -1,9 +1,10 @@
 import express, { Request, Response } from 'express';
-import { body, validationResult } from 'express-validator';
-import { RequestValidationError } from '../errors/request-validation-error';
-import { DatabaseConnectionError } from '../errors/database-connection-error';
+import { body } from 'express-validator';
+import jwt from 'jsonwebtoken';
 import { User } from '../models/user';
 import { BadRequestError } from '../errors/bad-request-error';
+
+const validate = require('../middlewares/validate-request'); // using this because error msg on typescript
 
 const router = express.Router();
 
@@ -16,29 +17,31 @@ router.post(
       .isLength({ min: 4, max: 20 })
       .withMessage('Password must be between 4 and 20 characters'),
   ],
+  validate.validateRequest,
   async (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      //   return res.status(400).send(errors.array());
-      throw new RequestValidationError(errors.array());
-    }
-
     const { email, password } = req.body;
-
-    // if (!email || typeof email !== 'string') {
-    //   res.status(400).send('Provide a valid email');
-    // }
-    // console.log('Creating a user...');
-    // throw new DatabaseConnectionError();
-
     const existingUser = await User.findOne({ email });
-
     if (existingUser) {
       throw new BadRequestError('Email already exisits');
     }
 
     const user = User.build({ email, password });
     await user.save();
+
+    const userJwt = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+      },
+      process.env.JWT_KEY!
+    );
+
+    req.session = {
+      jwt: userJwt,
+      isNew: true,
+      isChanged: false,
+      isPopulated: false,
+    };
 
     res.status(201).send(user);
   }
