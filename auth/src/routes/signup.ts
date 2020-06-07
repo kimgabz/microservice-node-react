@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import { User } from '../models/user';
 import { BadRequestError } from '../errors/bad-request-error';
 
-const validate = require('../middlewares/validate-request'); // using this because error msg on typescript
+import { validateRequest } from '../middlewares/validate-request'; // using this because error msg on typescript
 
 const router = express.Router();
 
@@ -17,7 +17,7 @@ router.post(
       .isLength({ min: 4, max: 20 })
       .withMessage('Password must be between 4 and 20 characters'),
   ],
-  validate.validateRequest,
+  validateRequest,
   async (req: Request, res: Response) => {
     const { email, password } = req.body;
     const existingUser = await User.findOne({ email });
@@ -36,12 +36,7 @@ router.post(
       process.env.JWT_KEY!
     );
 
-    req.session = {
-      jwt: userJwt,
-      isNew: true,
-      isChanged: false,
-      isPopulated: false,
-    };
+    req.session!.jwt = userJwt;
 
     res.status(201).send(user);
   }

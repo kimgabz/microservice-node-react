@@ -6,7 +6,7 @@ import { User } from '../models/user';
 import { BadRequestError } from '../errors/bad-request-error';
 import { Password } from '../services/password';
 
-const validate = require('../middlewares/validate-request'); // using this because error msg on typescript
+import { validateRequest } from '../middlewares/validate-request'; // using this because error msg on typescript
 
 const router = express.Router();
 
@@ -16,7 +16,7 @@ router.post(
     body('email').isEmail().withMessage('Email not valid'),
     body('password').trim().notEmpty().withMessage('Valid password required'),
   ],
-  validate.validateRequest,
+  validateRequest,
   async (req: Request, res: Response) => {
     const { email, password } = req.body;
     const existingUser = await User.findOne({ email });
@@ -41,12 +41,7 @@ router.post(
       process.env.JWT_KEY!
     );
 
-    req.session = {
-      jwt: userJwt,
-      isNew: true,
-      isChanged: false,
-      isPopulated: false,
-    };
+    req.session!.jwt = userJwt;
 
     res.status(200).send(existingUser);
   }

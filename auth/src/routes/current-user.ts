@@ -6,7 +6,6 @@ const router = express.Router();
 
 router.post(
   '/api/users/currentuser',
-  [],
   currentUser,
   // requireAuth,
   (req: Request, res: Response) => {
