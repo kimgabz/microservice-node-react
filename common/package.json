@@ -1,11 +1,11 @@
 {
-  "name": "common",
-  "version": "1.0.1",
-  "description": "",
+  "name": "@kimgabz/common",
+  "version": "1.0.7",
+  "description": "error handling files and middlewares",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
   "files": [
-    "./build/**/*"
+    "build/**/*"
   ],
   "scripts": {
     "clean": "del ./build/*",

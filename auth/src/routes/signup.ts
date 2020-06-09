@@ -2,9 +2,9 @@ import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user';
-import { BadRequestError } from '../errors/bad-request-error';
+import { BadRequestError } from '@kimgabz/common';
 
-import { validateRequest } from '../middlewares/validate-request'; // using this because error msg on typescript
+import { validateRequest } from '@kimgabz/common';
 
 const router = express.Router();
 
